@@ -19,10 +19,25 @@ jobs:
           repository: Brainrotlang/brainrot
           path: brainrot
 
+      - name: Force Ubuntu archive mirror
+        run: |
+          sudo sed -i \
+            's|azure.archive.ubuntu.com|archive.ubuntu.com|g' \
+            /etc/apt/apt-mirrors.txt
+          cat /etc/apt/apt-mirrors.txt
+
       - name: Install Brainrot build dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc flex bison libfl-dev
+          sudo apt-get \
+            -o Acquire::Retries=3 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            update
+          sudo apt-get \
+            -o Acquire::Retries=3 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            install -y gcc flex bison libfl-dev libasan8 libubsan1
 
       - name: Build Brainrot
         working-directory: brainrot
