@@ -170,7 +170,7 @@ skibidi main {
         }
 
         edgy (pivot_abs < 0.000000001) {
-            baka("gigatruss: singular stiffness matrix at pivot %d", k);
+            baka("gigatruss: singular stiffness matrix");
             ragequit(2);
         }
 
