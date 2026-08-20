@@ -1,300 +1,289 @@
-gigachad gt_abs(gigachad x) {
-    edgy (x < 0.0) {
-        bussin -x;
+gigachad gt_absx(gigachad aa) {
+    edgy (aa < 0.0) {
+        bussin -aa;
     }
-    bussin x;
+    bussin aa;
 }
 
-gigachad gt_sqrt(gigachad x) {
-    rizz i;
-    gigachad guess;
+gigachad gt_sqrt(gigachad aa) {
+    rizz ab;
+    gigachad ac;
 
-    edgy (x <= 0.0) {
+    edgy (aa <= 0.0) {
         bussin 0.0;
     }
 
-    guess = x;
-    edgy (guess < 1.0) {
-        guess = 1.0;
+    ac = aa;
+    edgy (ac < 1.0) {
+        ac = 1.0;
     }
 
-    flex (i = 0; i < 32; i = i + 1) {
-        guess = 0.5 * (guess + x / guess);
+    flex (ab = 0; ab < 32; ab = ab + 1) {
+        ac = 0.5 * (ac + aa / ac);
     }
 
-    bussin guess;
+    bussin ac;
 }
 
 skibidi main {
     🚽 Gigatruss v0.1: canonical 3-node triangular truss.
-    🚽 Units: metres, newtons, pascals.
-    🚽 Work variables are declared once because current Brainrot loop bodies
-    🚽 do not create a fresh lexical scope for repeated declarations.
+    🚽 Main-scope work identifiers are intentionally uniform-length to stay
+    🚽 compatible with the current Brainrot hashmap implementation.
 
-    rizz node_count = 3;
-    rizz member_count = 3;
-    rizz dof_count = 6;
+    rizz aa = 3;
+    rizz ab = 3;
+    rizz ac = 6;
 
-    gigachad node_x[3];
-    gigachad node_y[3];
-    rizz member_a[3];
-    rizz member_b[3];
-    gigachad member_E[3];
-    gigachad member_A[3];
+    gigachad ad[3];
+    gigachad ae[3];
+    rizz af[3];
+    rizz ag[3];
+    gigachad ah[3];
+    gigachad ai[3];
 
-    gigachad K[36];
-    gigachad K_original[36];
-    gigachad F[6];
-    gigachad F_original[6];
-    gigachad U[6];
-    gigachad R[6];
+    gigachad aj[36];
+    gigachad ak[36];
+    gigachad al[6];
+    gigachad am[6];
+    gigachad an[6];
+    gigachad ao[6];
+    rizz ap[6];
 
-    🚽 Use rizz rather than cap for the restraint mask. cap arrays currently
-    🚽 hit a misaligned scalar load in the Brainrot interpreter.
-    rizz fixed[6];
+    gigachad aq[16];
+    rizz ar[4];
 
-    gigachad ke[16];
-    rizz dofs[4];
+    rizz as;
+    rizz at;
+    rizz au;
+    rizz av;
+    rizz aw;
+    rizz ax;
+    rizz ay;
+    rizz az;
+    rizz ba;
+    rizz bb;
+    rizz bc;
 
-    rizz i;
-    rizz j;
-    rizz m;
-    rizz d;
-    rizz k;
-    rizz n;
-    rizz a;
-    rizz b;
-    rizz row;
-    rizz col;
-    rizz pivot_row;
+    gigachad bd;
+    gigachad be;
+    gigachad bf;
+    gigachad bg;
+    gigachad bh;
+    gigachad bi;
+    gigachad bj;
+    gigachad bk;
+    gigachad bl;
+    gigachad bm;
+    gigachad bn;
+    gigachad bo;
+    gigachad bp;
+    gigachad bq;
+    gigachad br;
+    gigachad bs;
 
-    gigachad dx;
-    gigachad dy;
-    gigachad length;
-    gigachad c;
-    gigachad s;
-    gigachad scale;
-    gigachad pivot_abs;
-    gigachad candidate;
-    gigachad tmp;
-    gigachad tmp_f;
-    gigachad factor;
-    gigachad rhs;
-    gigachad sum;
-    gigachad extension;
-    gigachad axial_force;
-    gigachad stress;
+    🚽 Geometry: node 1=(0,0), node 2=(4,0), node 3=(2,3).
+    ad[0] = 0.0;
+    ae[0] = 0.0;
+    ad[1] = 4.0;
+    ae[1] = 0.0;
+    ad[2] = 2.0;
+    ae[2] = 3.0;
 
-    🚽 Geometry.
-    node_x[0] = 0.0;
-    node_y[0] = 0.0;
-    node_x[1] = 4.0;
-    node_y[1] = 0.0;
-    node_x[2] = 2.0;
-    node_y[2] = 3.0;
+    af[0] = 0;
+    ag[0] = 1;
+    af[1] = 0;
+    ag[1] = 2;
+    af[2] = 1;
+    ag[2] = 2;
 
-    member_a[0] = 0;
-    member_b[0] = 1;
-    member_a[1] = 0;
-    member_b[1] = 2;
-    member_a[2] = 1;
-    member_b[2] = 2;
-
-    flex (m = 0; m < member_count; m = m + 1) {
-        member_E[m] = 200.0e9;
-        member_A[m] = 0.001;
+    flex (au = 0; au < ab; au = au + 1) {
+        ah[au] = 200.0e9;
+        ai[au] = 0.001;
     }
 
     🚽 Supports: node 1 fixed X/Y, node 2 fixed Y.
-    flex (i = 0; i < dof_count; i = i + 1) {
-        fixed[i] = 0;
+    flex (as = 0; as < ac; as = as + 1) {
+        ap[as] = 0;
     }
-    fixed[0] = 1;
-    fixed[1] = 1;
-    fixed[3] = 1;
+    ap[0] = 1;
+    ap[1] = 1;
+    ap[3] = 1;
 
     🚽 External load: node 3, Fy = -10 kN.
-    flex (i = 0; i < dof_count; i = i + 1) {
-        F[i] = 0.0;
-        U[i] = 0.0;
-        R[i] = 0.0;
+    flex (as = 0; as < ac; as = as + 1) {
+        al[as] = 0.0;
+        an[as] = 0.0;
+        ao[as] = 0.0;
     }
-    F[5] = -10000.0;
+    al[5] = -10000.0;
 
-    🚽 Zero global stiffness matrix.
-    flex (i = 0; i < 36; i = i + 1) {
-        K[i] = 0.0;
-        K_original[i] = 0.0;
+    flex (as = 0; as < 36; as = as + 1) {
+        aj[as] = 0.0;
+        ak[as] = 0.0;
     }
 
-    🚽 Assemble each 2D truss element into the 6x6 global matrix.
-    flex (m = 0; m < member_count; m = m + 1) {
-        a = member_a[m];
-        b = member_b[m];
+    🚽 Assemble element stiffness matrices into K.
+    flex (au = 0; au < ab; au = au + 1) {
+        ay = af[au];
+        az = ag[au];
 
-        dx = node_x[b] - node_x[a];
-        dy = node_y[b] - node_y[a];
-        length = gt_sqrt(dx * dx + dy * dy);
-        c = dx / length;
-        s = dy / length;
-        scale = member_E[m] * member_A[m] / length;
+        bd = ad[az] - ad[ay];
+        be = ae[az] - ae[ay];
+        bf = gt_sqrt(bd * bd + be * be);
+        bg = bd / bf;
+        bh = be / bf;
+        bi = ah[au] * ai[au] / bf;
 
-        ke[0]  = scale * c * c;
-        ke[1]  = scale * c * s;
-        ke[2]  = -scale * c * c;
-        ke[3]  = -scale * c * s;
+        aq[0] = bi * bg * bg;
+        aq[1] = bi * bg * bh;
+        aq[2] = -bi * bg * bg;
+        aq[3] = -bi * bg * bh;
+        aq[4] = bi * bg * bh;
+        aq[5] = bi * bh * bh;
+        aq[6] = -bi * bg * bh;
+        aq[7] = -bi * bh * bh;
+        aq[8] = -bi * bg * bg;
+        aq[9] = -bi * bg * bh;
+        aq[10] = bi * bg * bg;
+        aq[11] = bi * bg * bh;
+        aq[12] = -bi * bg * bh;
+        aq[13] = -bi * bh * bh;
+        aq[14] = bi * bg * bh;
+        aq[15] = bi * bh * bh;
 
-        ke[4]  = scale * c * s;
-        ke[5]  = scale * s * s;
-        ke[6]  = -scale * c * s;
-        ke[7]  = -scale * s * s;
+        ar[0] = 2 * ay;
+        ar[1] = 2 * ay + 1;
+        ar[2] = 2 * az;
+        ar[3] = 2 * az + 1;
 
-        ke[8]  = -scale * c * c;
-        ke[9]  = -scale * c * s;
-        ke[10] = scale * c * c;
-        ke[11] = scale * c * s;
-
-        ke[12] = -scale * c * s;
-        ke[13] = -scale * s * s;
-        ke[14] = scale * c * s;
-        ke[15] = scale * s * s;
-
-        dofs[0] = 2 * a;
-        dofs[1] = 2 * a + 1;
-        dofs[2] = 2 * b;
-        dofs[3] = 2 * b + 1;
-
-        flex (i = 0; i < 4; i = i + 1) {
-            flex (j = 0; j < 4; j = j + 1) {
-                row = dofs[i];
-                col = dofs[j];
-                K[row * dof_count + col] = K[row * dof_count + col] + ke[i * 4 + j];
+        flex (as = 0; as < 4; as = as + 1) {
+            flex (at = 0; at < 4; at = at + 1) {
+                ba = ar[as];
+                bb = ar[at];
+                aj[ba * ac + bb] = aj[ba * ac + bb] + aq[as * 4 + at];
             }
         }
     }
 
-    🚽 Preserve the unconstrained system for reaction recovery.
-    flex (i = 0; i < 36; i = i + 1) {
-        K_original[i] = K[i];
+    flex (as = 0; as < 36; as = as + 1) {
+        ak[as] = aj[as];
     }
-    flex (i = 0; i < dof_count; i = i + 1) {
-        F_original[i] = F[i];
+    flex (as = 0; as < ac; as = as + 1) {
+        am[as] = al[as];
     }
 
-    🚽 Apply zero-displacement boundary conditions by row/column elimination.
-    flex (d = 0; d < dof_count; d = d + 1) {
-        edgy (fixed[d] == 1) {
-            flex (j = 0; j < dof_count; j = j + 1) {
-                K[d * dof_count + j] = 0.0;
-                K[j * dof_count + d] = 0.0;
+    🚽 Zero-displacement boundary conditions.
+    flex (av = 0; av < ac; av = av + 1) {
+        edgy (ap[av] == 1) {
+            flex (at = 0; at < ac; at = at + 1) {
+                aj[av * ac + at] = 0.0;
+                aj[at * ac + av] = 0.0;
             }
-            K[d * dof_count + d] = 1.0;
-            F[d] = 0.0;
+            aj[av * ac + av] = 1.0;
+            al[av] = 0.0;
         }
     }
 
     🚽 Gaussian elimination with partial pivoting.
-    flex (k = 0; k < dof_count; k = k + 1) {
-        pivot_row = k;
-        pivot_abs = gt_abs(K[k * dof_count + k]);
+    flex (aw = 0; aw < ac; aw = aw + 1) {
+        bc = aw;
+        bj = gt_absx(aj[aw * ac + aw]);
 
-        flex (i = k + 1; i < dof_count; i = i + 1) {
-            candidate = gt_abs(K[i * dof_count + k]);
-            edgy (candidate > pivot_abs) {
-                pivot_abs = candidate;
-                pivot_row = i;
+        flex (as = aw + 1; as < ac; as = as + 1) {
+            bk = gt_absx(aj[as * ac + aw]);
+            edgy (bk > bj) {
+                bj = bk;
+                bc = as;
             }
         }
 
-        edgy (pivot_abs < 0.000000001) {
+        edgy (bj < 0.000000001) {
             baka("gigatruss: singular stiffness matrix");
             ragequit(2);
         }
 
-        edgy (pivot_row != k) {
-            flex (j = k; j < dof_count; j = j + 1) {
-                tmp = K[k * dof_count + j];
-                K[k * dof_count + j] = K[pivot_row * dof_count + j];
-                K[pivot_row * dof_count + j] = tmp;
+        edgy (bc != aw) {
+            flex (at = aw; at < ac; at = at + 1) {
+                bl = aj[aw * ac + at];
+                aj[aw * ac + at] = aj[bc * ac + at];
+                aj[bc * ac + at] = bl;
             }
-            tmp_f = F[k];
-            F[k] = F[pivot_row];
-            F[pivot_row] = tmp_f;
+            bm = al[aw];
+            al[aw] = al[bc];
+            al[bc] = bm;
         }
 
-        flex (i = k + 1; i < dof_count; i = i + 1) {
-            factor = K[i * dof_count + k] / K[k * dof_count + k];
-            K[i * dof_count + k] = 0.0;
-
-            flex (j = k + 1; j < dof_count; j = j + 1) {
-                K[i * dof_count + j] = K[i * dof_count + j] - factor * K[k * dof_count + j];
+        flex (as = aw + 1; as < ac; as = as + 1) {
+            bn = aj[as * ac + aw] / aj[aw * ac + aw];
+            aj[as * ac + aw] = 0.0;
+            flex (at = aw + 1; at < ac; at = at + 1) {
+                aj[as * ac + at] = aj[as * ac + at] - bn * aj[aw * ac + at];
             }
-            F[i] = F[i] - factor * F[k];
+            al[as] = al[as] - bn * al[aw];
         }
     }
 
     🚽 Back substitution.
-    row = dof_count - 1;
-    goon (row >= 0) {
-        rhs = F[row];
-        flex (j = row + 1; j < dof_count; j = j + 1) {
-            rhs = rhs - K[row * dof_count + j] * U[j];
+    ba = ac - 1;
+    goon (ba >= 0) {
+        bo = al[ba];
+        flex (at = ba + 1; at < ac; at = at + 1) {
+            bo = bo - aj[ba * ac + at] * an[at];
         }
-        U[row] = rhs / K[row * dof_count + row];
-        row = row - 1;
+        an[ba] = bo / aj[ba * ac + ba];
+        ba = ba - 1;
     }
 
-    🚽 Recover support reactions: R = K_original * U - F_original.
-    flex (i = 0; i < dof_count; i = i + 1) {
-        sum = 0.0;
-        flex (j = 0; j < dof_count; j = j + 1) {
-            sum = sum + K_original[i * dof_count + j] * U[j];
+    🚽 Reactions: R = K_original * U - F_original.
+    flex (as = 0; as < ac; as = as + 1) {
+        bp = 0.0;
+        flex (at = 0; at < ac; at = at + 1) {
+            bp = bp + ak[as * ac + at] * an[at];
         }
-        R[i] = sum - F_original[i];
+        ao[as] = bp - am[as];
     }
 
     yapping("GIGATRUSS v0.1");
     yapping("2D TRUSS STATIC ANALYSIS - finite rizz method");
     yapping("");
     yapping("NODE DISPLACEMENTS (m)");
-    flex (n = 0; n < node_count; n = n + 1) {
-        yapping("Node %d: Ux=%0.9f Uy=%0.9f", n + 1, U[2 * n], U[2 * n + 1]);
+    flex (ax = 0; ax < aa; ax = ax + 1) {
+        yapping("Node %d: Ux=%0.9f Uy=%0.9f", ax + 1, an[2 * ax], an[2 * ax + 1]);
     }
 
     yapping("");
     yapping("SUPPORT REACTIONS (N)");
-    flex (n = 0; n < node_count; n = n + 1) {
-        edgy (fixed[2 * n] == 1) {
-            yapping("Node %d: Rx=%0.3f", n + 1, R[2 * n]);
+    flex (ax = 0; ax < aa; ax = ax + 1) {
+        edgy (ap[2 * ax] == 1) {
+            yapping("Node %d: Rx=%0.3f", ax + 1, ao[2 * ax]);
         }
-        edgy (fixed[2 * n + 1] == 1) {
-            yapping("Node %d: Ry=%0.3f", n + 1, R[2 * n + 1]);
+        edgy (ap[2 * ax + 1] == 1) {
+            yapping("Node %d: Ry=%0.3f", ax + 1, ao[2 * ax + 1]);
         }
     }
 
     yapping("");
     yapping("MEMBER RESULTS");
-    flex (m = 0; m < member_count; m = m + 1) {
-        a = member_a[m];
-        b = member_b[m];
+    flex (au = 0; au < ab; au = au + 1) {
+        ay = af[au];
+        az = ag[au];
+        bd = ad[az] - ad[ay];
+        be = ae[az] - ae[ay];
+        bf = gt_sqrt(bd * bd + be * be);
+        bg = bd / bf;
+        bh = be / bf;
 
-        dx = node_x[b] - node_x[a];
-        dy = node_y[b] - node_y[a];
-        length = gt_sqrt(dx * dx + dy * dy);
-        c = dx / length;
-        s = dy / length;
+        bq = -bg * an[2 * ay] - bh * an[2 * ay + 1]
+           + bg * an[2 * az] + bh * an[2 * az + 1];
+        br = ah[au] * ai[au] / bf * bq;
+        bs = br / ai[au];
 
-        extension = -c * U[2 * a] - s * U[2 * a + 1]
-                  + c * U[2 * b] + s * U[2 * b + 1];
-        axial_force = member_E[m] * member_A[m] / length * extension;
-        stress = axial_force / member_A[m];
-
-        edgy (axial_force >= 0.0) {
+        edgy (br >= 0.0) {
             yapping("Member %d (%d-%d): N=%0.3f N, stress=%0.6f MPa, TENSION",
-                    m + 1, a + 1, b + 1, axial_force, stress / 1000000.0);
+                    au + 1, ay + 1, az + 1, br, bs / 1000000.0);
         } amogus {
             yapping("Member %d (%d-%d): N=%0.3f N, stress=%0.6f MPa, COMPRESSION",
-                    m + 1, a + 1, b + 1, axial_force, stress / 1000000.0);
+                    au + 1, ay + 1, az + 1, br, bs / 1000000.0);
         }
     }
 
