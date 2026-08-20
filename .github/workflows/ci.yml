@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gigatruss:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Gigatruss
+        uses: actions/checkout@v7
+
+      - name: Checkout Brainrot
+        uses: actions/checkout@v7
+        with:
+          repository: Brainrotlang/brainrot
+          path: brainrot
+
+      - name: Force Ubuntu archive mirror
+        run: |
+          sudo sed -i \
+            's|azure.archive.ubuntu.com|archive.ubuntu.com|g' \
+            /etc/apt/apt-mirrors.txt
+          cat /etc/apt/apt-mirrors.txt
+
+      - name: Install Brainrot build dependencies
+        run: |
+          sudo apt-get \
+            -o Acquire::Retries=3 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            update
+          sudo apt-get \
+            -o Acquire::Retries=3 \
+            -o Acquire::http::Timeout=15 \
+            -o Acquire::https::Timeout=15 \
+            install -y gcc flex bison libfl-dev libasan8 libubsan1
+
+      - name: Build Brainrot
+        working-directory: brainrot
+        run: make
+
+      - name: Run canonical truss
+        run: |
+          set -o pipefail
+          export LD_LIBRARY_PATH="$PWD/brainrot:${LD_LIBRARY_PATH:-}"
+          ./brainrot/brainrot src/gigatruss.brainrot | tee gigatruss.out
+
+      - name: Verify reference solution
+        run: |
+          grep -F "Node 2: Ux=0.000066667 Uy=0.000000000" gigatruss.out
+          grep -F "Node 3: Ux=0.000033333 Uy=-0.000152423" gigatruss.out
+          grep -F "Node 1: Ry=5000.000" gigatruss.out
+          grep -F "Node 2: Ry=5000.000" gigatruss.out
+          grep -F "Member 1 (1-2): N=3333.333 N, stress=3.333333 MPa, TENSION" gigatruss.out
+          grep -F "Member 2 (1-3): N=-6009.252 N, stress=-6.009252 MPa, COMPRESSION" gigatruss.out
+          grep -F "Member 3 (2-3): N=-6009.252 N, stress=-6.009252 MPa, COMPRESSION" gigatruss.out
+          grep -F "structure is bussin" gigatruss.out
