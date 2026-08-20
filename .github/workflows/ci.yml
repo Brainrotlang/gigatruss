@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - name: Checkout Gigatruss
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout Brainrot
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: Brainrotlang/brainrot
           path: brainrot
@@ -45,6 +45,7 @@ jobs:
 
       - name: Run canonical truss
         run: |
+          set -o pipefail
           export LD_LIBRARY_PATH="$PWD/brainrot:${LD_LIBRARY_PATH:-}"
           ./brainrot/brainrot src/gigatruss.brainrot | tee gigatruss.out
 
