@@ -1,6 +1,6 @@
 # Gigatruss
 
-**2D truss static analysis written entirely in [Brainrot](https://github.com/Brainrotlang/brainrot).**
+**2D truss static analysis written in [Brainrot](https://github.com/Brainrotlang/brainrot).**
 
 Gigatruss is a small finite-element / matrix-stiffness solver whose primary engineering goal is to solve real planar truss problems and whose secondary goal is to prove that a language containing `skibidi`, `gigachad`, `flex`, `edgy`, and `bussin` can still do respectable structural mechanics.
 
@@ -8,7 +8,7 @@ Gigatruss is a small finite-element / matrix-stiffness solver whose primary engi
 
 ## v0.1 scope
 
-The first version solves one canonical three-node triangular truss using only Brainrot code:
+The first version solves one canonical three-node triangular truss:
 
 - 2 translational DOFs per node
 - 2D bar-element stiffness matrix
@@ -19,9 +19,8 @@ The first version solves one canonical three-node triangular truss using only Br
 - support reaction recovery
 - member axial force and stress
 - tension/compression classification
-- Newton-Raphson square root implemented in Brainrot
 
-No BLAS, LAPACK, native math library, raylib, or file I/O is required.
+The FEM kernel remains Brainrot code. Gigatruss also ships an optional typed native math extension built on Brainrot's stdrot ABI v2, exposing `giga_sqrt`, `giga_hypot`, and `giga_abs` as semantic-checked native functions.
 
 ## Reference model
 
@@ -71,19 +70,45 @@ Member 3: -6009.252 N  compression  -6.009252 MPa
 
 ## Run
 
-Build Brainrot, then execute:
-
-```bash
-brainrot src/gigatruss.brainrot
-```
-
-If running directly from a Brainrot checkout:
+Build Brainrot first. For the original pure-Brainrot solver path:
 
 ```bash
 /path/to/brainrot/brainrot src/gigatruss.brainrot
 ```
 
-The v0.1 model is intentionally hard-coded. Input files and general model parsing belong to a later milestone once Brainrot file I/O lands.
+To build Gigatruss' typed native math extension against a Brainrot checkout:
+
+```bash
+make native BRAINROT_DIR=/path/to/brainrot
+```
+
+Then point Brainrot at the combined stdrot v2 library:
+
+```bash
+export STDROT_LIB_PATH="$PWD/build/libgigatruss_stdrot.so"
+/path/to/brainrot/brainrot tests/native_math_smoke.brainrot
+/path/to/brainrot/brainrot src/gigatruss.brainrot
+```
+
+The native extension intentionally contains only elementary math primitives. Global stiffness assembly, boundary-condition application, Gaussian elimination, reactions, and member force/stress recovery remain in Brainrot.
+
+## Typed native ABI
+
+Brainrot's stdrot ABI v2 allows native functions to publish signatures that drive both semantic checking and runtime marshalling. Gigatruss uses that contract directly:
+
+```text
+giga_sqrt(gigachad) -> gigachad
+giga_hypot(gigachad, gigachad) -> gigachad
+giga_abs(gigachad) -> gigachad
+```
+
+CI tests both sides of the contract:
+
+- valid calls execute and return the expected numerical results
+- an invalid call such as `giga_sqrt("not a number")` must fail semantic analysis
+- the canonical truss still reproduces the reference solution while loaded through the extended stdrot library
+
+This makes Gigatruss both a structural-analysis example and a real downstream consumer of Brainrot's typed native ABI.
 
 ## Method
 
@@ -129,6 +154,9 @@ See [`docs/THEORY.md`](docs/THEORY.md) for the derivation.
 - [x] pivoted dense solver
 - [x] reactions
 - [x] member force / stress recovery
+- [x] typed native math extension
+- [x] downstream ABI semantic-check fixture
+- [ ] migrate solver geometry helpers to native math calls
 - [ ] reusable model representation
 - [ ] arbitrary node/member counts
 - [ ] model input from files
