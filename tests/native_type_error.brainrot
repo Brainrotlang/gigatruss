@@ -1,0 +1,7 @@
+🚽 giga_sqrt is declared gigachad -> gigachad.
+🚽 This must fail semantic analysis before the native function runs.
+skibidi main {
+    gigachad x = giga_sqrt("absolutely not a number");
+    yapping("%f", x);
+    bussin 0;
+}
