@@ -43,10 +43,34 @@ jobs:
         working-directory: brainrot
         run: make
 
+      - name: Build Gigatruss typed native library
+        run: make native BRAINROT_DIR=brainrot
+
+      - name: Smoke-test typed native math
+        run: |
+          set -o pipefail
+          export LD_LIBRARY_PATH="$PWD/brainrot:${LD_LIBRARY_PATH:-}"
+          export STDROT_LIB_PATH="$PWD/build/libgigatruss_stdrot.so"
+          ./brainrot/brainrot tests/native_math_smoke.brainrot | tee native-math.out
+          grep -F "sqrt=3.000 hypot=5.000 abs=2.500" native-math.out
+
+      - name: Prove typed ABI rejects bad native argument
+        run: |
+          set +e
+          export LD_LIBRARY_PATH="$PWD/brainrot:${LD_LIBRARY_PATH:-}"
+          export STDROT_LIB_PATH="$PWD/build/libgigatruss_stdrot.so"
+          ./brainrot/brainrot tests/native_type_error.brainrot > native-type-error.out 2>&1
+          status=$?
+          set -e
+          cat native-type-error.out
+          test "$status" -ne 0
+          grep -E "type|Type|argument|Argument|giga_sqrt" native-type-error.out
+
       - name: Run canonical truss
         run: |
           set -o pipefail
           export LD_LIBRARY_PATH="$PWD/brainrot:${LD_LIBRARY_PATH:-}"
+          export STDROT_LIB_PATH="$PWD/build/libgigatruss_stdrot.so"
           ./brainrot/brainrot src/gigatruss.brainrot | tee gigatruss.out
 
       - name: Verify reference solution
