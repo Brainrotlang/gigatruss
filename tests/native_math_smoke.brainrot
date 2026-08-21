@@ -1,0 +1,9 @@
+🚽 Smoke test for Gigatruss' stdrot ABI v2 extension.
+skibidi main {
+    gigachad aa = giga_sqrt(9.0);
+    gigachad ab = giga_hypot(3.0, 4.0);
+    gigachad ac = giga_abs(-2.5);
+
+    yapping("sqrt=%0.3f hypot=%0.3f abs=%0.3f", aa, ab, ac);
+    bussin 0;
+}
